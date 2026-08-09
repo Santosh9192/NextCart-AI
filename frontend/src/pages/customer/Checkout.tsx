@@ -5,7 +5,7 @@ import { fetchCart, clearCartThunk } from "@/features/cart/CartSlice";
 import { Loader2, ArrowLeft, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "@/api/axios";
-import API_BASE_URL from "@/constants/api";
+import { getImageUrl } from "@/constants/api";
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -124,9 +124,8 @@ export default function Checkout() {
                     <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden">
                       <img
                         src={
-                          item.product?.images?.[0]?.image_url
-                            ? `${API_BASE_URL}/${item.product.images[0].image_url}`
-                            : "https://placehold.co/100x100"
+                          getImageUrl(item.product?.images?.[0]?.image_url) ||
+                          "https://placehold.co/100x100"
                         }
                         alt={item.product?.name}
                         className="w-full h-full object-cover"
