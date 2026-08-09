@@ -20,8 +20,9 @@ services:
         value: "1440"
       - key: CORS_ORIGINS
         value: "*"
-  - type: postgres
-    name: nextcart-db
+
+databases:
+  - name: nextcart-db
     plan: free
     databaseName: nextcart
     user: nextcart
