@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import CORS_ORIGINS, UPLOAD_DIR
 from .database import Base, SessionLocal, engine
+from .demo_data import seed_demo_data
 from .routers import admin, auth, cart, categories, orders, products, wishlist
 from .seed import seed_database
 
@@ -39,6 +40,7 @@ def on_startup():
     db = SessionLocal()
     try:
         seed_database(db)
+        seed_demo_data(db)
     finally:
         db.close()
 
