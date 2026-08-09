@@ -5,6 +5,7 @@ import { fetchCart, clearCartThunk } from "@/features/cart/CartSlice";
 import { Loader2, ArrowLeft, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "@/api/axios";
+import API_BASE_URL from "@/constants/api";
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -124,7 +125,7 @@ export default function Checkout() {
                       <img
                         src={
                           item.product?.images?.[0]?.image_url
-                            ? `http://127.0.0.1:8000/${item.product.images[0].image_url}`
+                            ? `${API_BASE_URL}/${item.product.images[0].image_url}`
                             : "https://placehold.co/100x100"
                         }
                         alt={item.product?.name}

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { getWishlist, removeFromWishlist } from "./WishlistAPI";
 import { Heart, Trash2, Loader2, ShoppingBag } from "lucide-react";
 import toast from "react-hot-toast";
+import API_BASE_URL from "@/constants/api";
 
 export default function WishlistPage() {
   const [items, setItems] = useState<any[]>([]);
@@ -78,7 +79,7 @@ export default function WishlistPage() {
                 <img
                   src={
                     imgUrl
-                      ? `http://127.0.0.1:8000/${imgUrl}`
+                      ? `${API_BASE_URL}/${imgUrl}`
                       : "https://placehold.co/400x400?text=Product"
                   }
                   alt={p?.name}

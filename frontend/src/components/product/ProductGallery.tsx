@@ -1,3 +1,5 @@
+import API_BASE_URL from "@/constants/api";
+
 interface Props {
     image: string;
     name: string;
@@ -9,7 +11,7 @@ export default function ProductGallery({ image, name }: Props) {
             <img
                 src={
                     image
-                        ? `http://127.0.0.1:8000/${image}`
+                        ? `${API_BASE_URL}/${image}`
                         : "https://placehold.co/700x700?text=Product"
                 }
                 alt={name}

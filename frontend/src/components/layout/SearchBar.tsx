@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Search, Loader2 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "@/api/axios";
+import API_BASE_URL from "@/constants/api";
 
 interface Suggestion {
   id: number;
@@ -95,7 +96,7 @@ export default function SearchBar() {
               >
                 <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden shrink-0">
                   <img
-                    src={s.image_url ? `http://127.0.0.1:8000/${s.image_url}` : "https://placehold.co/100x100"}
+                    src={s.image_url ? `${API_BASE_URL}/${s.image_url}` : "https://placehold.co/100x100"}
                     alt={s.name}
                     className="w-full h-full object-cover"
                   />

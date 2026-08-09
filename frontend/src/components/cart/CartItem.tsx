@@ -7,6 +7,7 @@ import type { CartItem as CartItemType } from "@/types/cart";
 import { Trash2, Minus, Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import { useState } from "react";
+import API_BASE_URL from "@/constants/api";
 
 interface Props {
   item: CartItemType;
@@ -59,7 +60,7 @@ export default function CartItem({ item }: Props) {
         <img
           src={
             imageUrl
-              ? `http://127.0.0.1:8000/${imageUrl}`
+              ? `${API_BASE_URL}/${imageUrl}`
               : "https://placehold.co/400x400?text=Item"
           }
           alt={product.name}
