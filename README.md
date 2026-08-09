@@ -32,8 +32,30 @@
 
 ---
 
+## 🌐 Live Demo
+
+Both applications are deployed and running:
+
+| Application | URL |
+|-------------|-----|
+| 🛍️ **Frontend (React SPA)** | [https://next-cart-ai-psi.vercel.app](https://next-cart-ai-psi.vercel.app) |
+| ⚙️ **Backend (FastAPI)** | [https://nextcart-ai-api.onrender.com](https://nextcart-ai-api.onrender.com) |
+| 📚 **API Docs (Swagger UI)** | [https://nextcart-ai-api.onrender.com/docs](https://nextcart-ai-api.onrender.com/docs) |
+| 💓 **API Health Check** | [https://nextcart-ai-api.onrender.com/health](https://nextcart-ai-api.onrender.com/health) |
+
+### 🔑 Demo Credentials
+
+| Role | Email | Password |
+|------|-------|----------|
+| **Admin** | `admin@nextcart.ai` | `admin123` |
+
+> Register a new customer account from the frontend to explore the shopping experience.
+
+---
+
 ## 📋 Table of Contents
 
+- [Live Demo](#-live-demo)
 - [Overview](#-overview)
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
@@ -118,12 +140,11 @@ The platform is designed with scalability and developer experience in mind — f
 | **Framework** | FastAPI (via Starlette + Uvicorn) | High-performance async API server |
 | **ORM** | SQLAlchemy 2.0 | Database abstraction and model management |
 | **Database** | PostgreSQL (via psycopg2) | Production-grade relational database |
-| **Auth** | python-jose (JWT) + passlib | Token generation, password hashing |
-| **ML** | scikit-learn + pandas + scipy | Product recommendation engine |
-| **Config** | python-decouple + python-dotenv | Environment variable management |
+| **Auth** | PyJWT + bcrypt | Token generation, password hashing |
+| **ML** | Lightweight content-based engine | Product recommendations (category, brand, price similarity) |
+| **Config** | python-dotenv | Environment variable management |
 | **Validation** | Pydantic | Request/response data validation |
-| **Files** | python-multipart + Pillow | Image upload processing |
-| **Utilities** | python-slugify | URL-friendly slug generation |
+| **Files** | python-multipart | Image upload processing |
 
 ---
 
@@ -261,17 +282,21 @@ NextCart AI/
 │   └── tailwind.config.ts
 │
 ├── backend/                          # FastAPI + Python backend
-│   └── venv/                         # Python virtual environment
-│       └── Lib/site-packages/
-│           ├── fastapi/              # Async web framework
-│           ├── sqlalchemy/           # ORM (v2.0.51)
-│           ├── psycopg2/             # PostgreSQL adapter
-│           ├── pydantic/             # Data validation
-│           ├── python-jose/          # JWT token handling
-│           ├── passlib/              # Password hashing
-│           ├── scikit-learn/         # ML recommendation engine
-│           ├── pandas/               # Data analysis
-│           └── uvicorn/              # ASGI server
+│   ├── app/
+│   │   ├── main.py                   # FastAPI app (CORS, static files, routers)
+│   │   ├── config.py                 # Environment configuration
+│   │   ├── database.py               # SQLAlchemy engine + session
+│   │   ├── models.py                 # ORM models (User, Product, Cart, Order...)
+│   │   ├── schemas.py                # Pydantic request/response schemas
+│   │   ├── security.py               # JWT (PyJWT) + bcrypt password hashing
+│   │   ├── deps.py                   # Auth/Admin dependencies
+│   │   ├── serializers.py            # API response shapes
+│   │   ├── recommendations.py        # Content-based recommendation engine
+│   │   ├── seed.py                   # Seeds admin user, categories & products
+│   │   └── routers/                  # auth, products, cart, orders, admin...
+│   ├── requirements.txt
+│   ├── render.yaml                   # Render Blueprint (web service + Postgres)
+│   └── .env.example
 │
 ├── screenshots/                      # Application screenshots for README
 └── docs/                             # Documentation
@@ -314,17 +339,17 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # Set up environment variables
-# Create .env file in backend root:
+# Create .env file in backend root (see backend/.env.example):
 echo "DATABASE_URL=postgresql://postgres:password@localhost:5432/nextcart_ai" > .env
 echo "SECRET_KEY=your-secret-key-here" >> .env
 echo "ALGORITHM=HS256" >> .env
-echo "ACCESS_TOKEN_EXPIRE_MINUTES=30" >> .env
+echo "ACCESS_TOKEN_EXPIRE_MINUTES=1440" >> .env
 
-# Run database migrations
-alembic upgrade head
+# Tables are created automatically on startup (SQLAlchemy create_all)
+# and the database is seeded with an admin user + sample products.
 
 # Start the server
-uvicorn main:app --reload --port 8000
+uvicorn app.main:app --reload --port 8000
 ```
 
 ### 3️⃣ Frontend Setup
@@ -345,6 +370,15 @@ npm run dev
 - **Frontend**: Open [http://localhost:5173](http://localhost:5173)
 - **Backend API**: Open [http://localhost:8000/docs](http://localhost:8000/docs) (FastAPI Swagger UI)
 - **API Health**: `GET http://localhost:8000/health`
+
+### ☁️ Production Deployments
+
+This project is live in production — the frontend auto-deploys to **Vercel** on every push to `main`, and the backend + PostgreSQL auto-deploy to **Render** via `backend/render.yaml` (Blueprint).
+
+- **Frontend**: [https://next-cart-ai-psi.vercel.app](https://next-cart-ai-psi.vercel.app)
+- **Backend**: [https://nextcart-ai-api.onrender.com](https://nextcart-ai-api.onrender.com)
+
+**Frontend → Backend wiring:** the frontend reads the backend URL from the `VITE_API_BASE_URL` build-time env var (set in Vercel → Settings → Environment Variables → `VITE_API_BASE_URL=https://nextcart-ai-api.onrender.com`). Locally it falls back to `http://127.0.0.1:8000` (see `frontend/src/constants/api.ts`).
 
 ---
 
@@ -508,12 +542,11 @@ User Login → POST /auth/login → Server validates credentials
 
 ## 🤖 ML Recommendations
 
-The recommendation engine uses **scikit-learn** to analyze product data and user behavior:
+The recommendation engine powers the "You May Also Like" suggestions on product pages:
 
-- **Content-based filtering**: Analyzes product features (category, brand, price range) to find similar items
-- **Collaborative signals**: Uses purchase patterns and ratings data
+- **Content-based filtering**: Scores products by category match, brand match, price proximity, and name-token overlap
 - **Real-time inference**: Recommendations are computed on-the-fly via `GET /products/:id/recommend`
-- **Tech stack**: scikit-learn for ML models, pandas for data processing, scipy for numerical computations
+- **Lightweight**: Implemented in pure Python (`backend/app/recommendations.py`) so it deploys fast and runs without heavy ML dependencies
 
 ---
 
@@ -524,7 +557,7 @@ The recommendation engine uses **scikit-learn** to analyze product data and user
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `API_BASE_URL` | `http://127.0.0.1:8000` | Backend API endpoint |
+| `VITE_API_BASE_URL` | `http://127.0.0.1:8000` | Backend API endpoint. Set in Vercel for production (e.g. `https://nextcart-ai-api.onrender.com`). |
 
 ### Backend (`.env` file)
 
