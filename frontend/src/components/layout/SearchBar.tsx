@@ -19,7 +19,7 @@ export default function SearchBar() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const ref = useRef<HTMLDivElement>(null);
-  const timer = useRef<ReturnType<typeof setTimeout>>();
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {

@@ -22,7 +22,11 @@ const initialState: CartState = {
   error: null,
 };
 
-export const fetchCart = createAsyncThunk(
+export const fetchCart = createAsyncThunk<
+  { items: CartItem[]; totalPrice: number },
+  void,
+  { rejectValue: string }
+>(
   "cart/fetchCart",
   async (_, { rejectWithValue }) => {
     try {
@@ -39,7 +43,11 @@ export const fetchCart = createAsyncThunk(
   }
 );
 
-export const addToCartThunk = createAsyncThunk(
+export const addToCartThunk = createAsyncThunk<
+  { items: CartItem[]; totalPrice: number },
+  { productId: number; quantity: number },
+  { rejectValue: string }
+>(
   "cart/addToCart",
   async (
     { productId, quantity }: { productId: number; quantity: number },
@@ -59,7 +67,11 @@ export const addToCartThunk = createAsyncThunk(
   }
 );
 
-export const updateCartItemThunk = createAsyncThunk(
+export const updateCartItemThunk = createAsyncThunk<
+  { items: CartItem[]; totalPrice: number },
+  { productId: number; quantity: number },
+  { rejectValue: string }
+>(
   "cart/updateCartItem",
   async (
     { productId, quantity }: { productId: number; quantity: number },
@@ -79,7 +91,11 @@ export const updateCartItemThunk = createAsyncThunk(
   }
 );
 
-export const removeCartItemThunk = createAsyncThunk(
+export const removeCartItemThunk = createAsyncThunk<
+  { items: CartItem[]; totalPrice: number },
+  number,
+  { rejectValue: string }
+>(
   "cart/removeCartItem",
   async (productId: number, { rejectWithValue }) => {
     try {
@@ -96,7 +112,11 @@ export const removeCartItemThunk = createAsyncThunk(
   }
 );
 
-export const clearCartThunk = createAsyncThunk(
+export const clearCartThunk = createAsyncThunk<
+  { items: CartItem[]; totalPrice: number },
+  void,
+  { rejectValue: string }
+>(
   "cart/clearCart",
   async (_, { rejectWithValue }) => {
     try {
